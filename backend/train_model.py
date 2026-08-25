@@ -116,5 +116,31 @@ def train_kaggle_model():
     
     print(f"Model and encoders saved successfully in '{models_dir}' directory.")
 
+    # Save model metadata in SQLite database
+    try:
+        from database import init_db, save_model_metadata
+        init_db()
+        save_model_metadata(
+            model_name="KidneyCare Random Forest Classifier",
+            version=f"1.0.{int(os.path.getmtime(os.path.join(models_dir, 'kidney_model.joblib')))}",
+            accuracy=float(round(acc, 4)),
+            algorithm="RandomForestClassifier",
+            hyperparameters={
+                "criterion": "entropy",
+                "max_depth": 11,
+                "max_features": "sqrt",
+                "min_samples_leaf": 2,
+                "min_samples_split": 3,
+                "n_estimators": 130,
+                "random_state": 42
+            },
+            feature_names=X.columns.tolist(),
+            is_active=True
+        )
+        print("Model metadata successfully saved to SQLite database.")
+    except Exception as db_err:
+        print(f"Failed to record model metadata in DB: {db_err}")
+
 if __name__ == "__main__":
     train_kaggle_model()
+
