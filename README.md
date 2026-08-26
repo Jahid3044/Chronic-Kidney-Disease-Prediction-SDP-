@@ -35,6 +35,10 @@ This launches both services together:
 
 This avoids the frequent "Connection Error" caused by forgetting to start the backend manually before making a prediction.
 
+In VS Code, the startup task runs automatically when this folder opens. You can also start it with **Terminal > Run Build Task** (`Ctrl+Shift+B`). Use the URL printed by the task: `http://127.0.0.1:3000`.
+
+The **Go Live** button only serves static frontend files; it cannot start the Python API. If you use Go Live, start **KidneyCare: Start App** first (or use `Ctrl+Shift+B`) so the backend on port `8000` is available.
+
 ### 1. Backend Setup
 1. Navigate to the backend directory:
    ```bash

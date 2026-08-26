@@ -996,6 +996,7 @@ const App = () => {
     const [page, setPage] = useState('home');
     const [isDark, setIsDark] = useState(true);
     const [serverStatus, setServerStatus] = useState('checking');
+    const healthFailureCountRef = useRef(0);
     const [user, setUser] = useState(() => {
         try {
             const saved = localStorage.getItem('currentUser');
@@ -1017,12 +1018,16 @@ const App = () => {
             const apiBaseUrl = await resolveApiBaseUrl();
             const res = await axios.get(`${apiBaseUrl}/health`, { timeout: 3000 });
             if (res.data && res.data.status === 'ok') {
+                healthFailureCountRef.current = 0;
                 setServerStatus('online');
-            } else {
+            } else if (healthFailureCountRef.current >= 2) {
                 setServerStatus('offline');
             }
         } catch (e) {
-            setServerStatus('offline');
+            healthFailureCountRef.current += 1;
+            if (healthFailureCountRef.current >= 3) {
+                setServerStatus('offline');
+            }
         }
     };
 
