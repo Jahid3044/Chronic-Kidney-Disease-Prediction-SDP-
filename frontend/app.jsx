@@ -29,7 +29,7 @@ const formFields = [
     { name: 'anemia', label: 'Anemia', type: 'select', options: ['yes', 'no'] },
 ];
 
-const API_BASE_URLS = ['http://127.0.0.1:8000', 'http://localhost:8000'];
+const API_BASE_URLS = ['https://kidney-disease-api.onrender.com'];
 let cachedApiBaseUrl = null;
 
 const resolveApiBaseUrl = async () => {
