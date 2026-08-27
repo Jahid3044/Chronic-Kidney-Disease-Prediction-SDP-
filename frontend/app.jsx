@@ -831,8 +831,13 @@ const AdminPage = () => {
     const [isRegistering, setIsRegistering] = useState(null);
     const [token, setToken] = useState(() => sessionStorage.getItem('adminToken') || '');
     const [records, setRecords] = useState([]);
+    const [patientSearch, setPatientSearch] = useState('');
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    const filteredRecords = records.filter(record =>
+        String(record.patient_id || '').toLowerCase().includes(patientSearch.trim().toLowerCase())
+    );
 
     const loadRecords = async (adminToken) => {
         try {
@@ -970,12 +975,25 @@ const AdminPage = () => {
             </div>
             {error && <p className="p-3 rounded-lg bg-red-500/10 text-red-500 text-sm font-semibold">{error}</p>}
             <div className="glass rounded-3xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="p-5 border-b border-gray-200 dark:border-gray-700"><span className="font-bold">{records.length}</span> saved patient assessments</div>
+                <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <span><span className="font-bold">{filteredRecords.length}</span> of {records.length} saved patient assessments</span>
+                    <div className="relative w-full md:w-80">
+                        <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            type="search"
+                            value={patientSearch}
+                            onChange={event => setPatientSearch(event.target.value)}
+                            placeholder="Search by Patient ID"
+                            aria-label="Search by Patient ID"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-900/50 outline-none focus:ring-2 focus:ring-primary"
+                        />
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-gray-100/50 dark:bg-gray-800/30 text-gray-500"><tr><th className="p-4">Patient</th><th className="p-4">Submitted By</th><th className="p-4">Date</th><th className="p-4">Kidney Risk</th><th className="p-4">Result</th><th className="p-4">Action</th></tr></thead>
                         <tbody>
-                            {records.map(record => <tr key={record.record_id} className="border-b border-gray-100 dark:border-gray-800">
+                            {filteredRecords.map(record => <tr key={record.record_id} className="border-b border-gray-100 dark:border-gray-800">
                                 <td className="p-4 font-bold text-primary">{record.patient_id}</td>
                                 <td className="p-4"><span className="font-semibold">{record.name || 'Unknown user'}</span><span className="block text-xs text-gray-500">{record.user_email}</span></td>
                                 <td className="p-4 text-sm">{record.date}</td>
@@ -983,7 +1001,7 @@ const AdminPage = () => {
                                 <td className="p-4 font-semibold">{record.status} ({record.confidence})</td>
                                 <td className="p-4"><div className="flex flex-wrap gap-2"><button onClick={() => viewReport(record)} className="px-3 py-1.5 bg-secondary/10 text-secondary rounded-lg font-semibold text-sm flex items-center gap-1"><i className="ph-bold ph-eye"></i> View Report</button><button onClick={() => downloadReport(record.patient_id)} className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg font-semibold text-sm flex items-center gap-1"><i className="ph-bold ph-download-simple"></i> Patient CSV</button></div></td>
                             </tr>)}
-                            {records.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-gray-500">No patient assessments are available.</td></tr>}
+                            {filteredRecords.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-gray-500">{patientSearch ? 'No patient assessments match that Patient ID.' : 'No patient assessments are available.'}</td></tr>}
                         </tbody>
                     </table>
                 </div>
